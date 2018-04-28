@@ -21,9 +21,9 @@ function copyUsersPost(snapshot, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const firestore = admin.firestore();
         const userId = context.params.userId;
-        const data = snapshot.data();
-        data.authorRef = firestore.collection('users').doc(userId);
-        yield firestore.collection('posts').doc(snapshot.id).create(data);
+        const post = snapshot.data();
+        post.authorRef = firestore.collection('users').doc(userId);
+        yield firestore.collection('posts').doc(snapshot.id).set(post, { merge: true });
     });
 }
 //# sourceMappingURL=index.js.map
