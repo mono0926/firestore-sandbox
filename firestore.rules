@@ -31,9 +31,11 @@ service cloud.firestore {
         validateString(incomingData().name, 1, 20);
       match /posts/{postId} {
         allow create, update: if isUserAuthenticated(userId) &&
-        incomingData().size() == 3 &&
-        incomingData().keys().hasAll(['title', 'body', 'createTime']) &&
-        validateString(incomingData().title, 1, 50);
+          incomingData().size() == 3 &&
+          incomingData().keys().hasAll(['title', 'body', 'createTime']) &&
+          validateString(incomingData().title, 1, 50) &&
+          validateString(incomingData().body, 1, 100000) &&
+          incomingData().createTime is timestamp;
         allow delete: if isUserAuthenticated(userId)
       }
     }
