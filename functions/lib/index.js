@@ -11,19 +11,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
+const firestore = admin.firestore();
 exports.onUsersPostCreate = functions.firestore.document('/users/{userId}/posts/{postId}').onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
-    yield copyUsersPost(snapshot, context);
+    yield copyToRootWithUsersPostSnapshot(snapshot, context);
 }));
 exports.onUsersPostUpdate = functions.firestore.document('/users/{userId}/posts/{postId}').onUpdate((change, context) => __awaiter(this, void 0, void 0, function* () {
-    yield copyUsersPost(change.after, context);
+    yield copyToRootWithUsersPostSnapshot(change.after, context);
 }));
-function copyUsersPost(snapshot, context) {
+function copyToRootWithUsersPostSnapshot(snapshot, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        const firestore = admin.firestore();
+        const postId = snapshot.id;
         const userId = context.params.userId;
         const post = snapshot.data();
         post.authorRef = firestore.collection('users').doc(userId);
-        yield firestore.collection('posts').doc(snapshot.id).set(post, { merge: true });
+        yield firestore.collection('posts').doc(postId).set(post, { merge: true });
     });
 }
 //# sourceMappingURL=index.js.map
