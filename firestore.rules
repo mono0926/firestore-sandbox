@@ -1,7 +1,43 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write;
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isUserAuthenticated(userId) {
+      return request.auth.uid == userId;
+    }
+    function existingData() {
+      return resource.data;
+    }
+    function incomingData() {
+      return request.resource.data;
+    }
+    function validateString(text, min, max) {
+      return text is string &&
+      text.size() <= max &&
+      text.size() >= min
+    }
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    match /posts/{postId} {
+      allow read: if isAuthenticated();
+    }
+    match /users/{userId} {
+      allow get: if isAuthenticated();
+      allow create, update: if (isUserAuthenticated(userId) || isAdmin()) &&
+        incomingData().size() == 1 &&
+        incomingData().keys().hasAll(['name']) &&
+        validateString(incomingData().name, 1, 20);
+      match /posts/{postId} {
+        allow create, update: if isUserAuthenticated(userId) &&
+        incomingData().size() == 3 &&
+        incomingData().keys().hasAll(['title', 'body', 'createTime']) &&
+        validateString(incomingData().title, 1, 50);
+        allow delete: if isUserAuthenticated(userId)
+      }
     }
   }
 }
+
+
