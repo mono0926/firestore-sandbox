@@ -10,9 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const util = require("util");
 admin.initializeApp(functions.config().firebase);
 const firestore = admin.firestore();
 exports.onUsersPostCreate = functions.firestore.document('/users/{userId}/posts/{postId}').onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
+    console.log(`snapshot: ${util.inspect(snapshot.ref.path)}`);
     yield copyToRootWithUsersPostSnapshot(snapshot, context);
 }));
 exports.onUsersPostUpdate = functions.firestore.document('/users/{userId}/posts/{postId}').onUpdate((change, context) => __awaiter(this, void 0, void 0, function* () {

@@ -1,18 +1,20 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as util from 'util';
 admin.initializeApp(functions.config().firebase);
 const firestore = admin.firestore();
 
-interface Post {
+export interface Post {
   readonly title: string;
   readonly body: string;
 }
 
-interface RootPost extends Post {
+export interface RootPost extends Post {
   authorRef?: FirebaseFirestore.DocumentReference;
 }
 
 export const onUsersPostCreate = functions.firestore.document('/users/{userId}/posts/{postId}').onCreate(async (snapshot, context) => {
+  console.log(`snapshot: ${util.inspect(snapshot.ref.path)}`);
   await copyToRootWithUsersPostSnapshot(snapshot, context);
 });
 export const onUsersPostUpdate = functions.firestore.document('/users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
