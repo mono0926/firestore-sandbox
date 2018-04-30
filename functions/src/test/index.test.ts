@@ -1,8 +1,10 @@
+// assertを使えるように
 import * as chai from 'chai';
 const assert = chai.assert;
-import * as myUtil from '../util';
+// Firebaseライブラリ
 import * as admin from 'firebase-admin';
 import * as fftest from 'firebase-functions-test';
+// 自動テスト用プロジェクトを初期化
 const test = fftest({
   databaseURL: 'https://firestore-test-mono.firebaseio.com',
   storageBucket: 'firestore-test-mono.appspot.com',
@@ -11,6 +13,8 @@ const test = fftest({
 
 import * as target from '../index';
 const firestore = admin.firestore();
+
+import * as myUtil from '../util';
 
 describe('index.tsに定義されたFirestoreトリガー', () => {
   after(() => {

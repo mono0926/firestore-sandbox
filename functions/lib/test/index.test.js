@@ -8,11 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// assertを使えるように
 const chai = require("chai");
 const assert = chai.assert;
-const myUtil = require("../util");
+// Firebaseライブラリ
 const admin = require("firebase-admin");
 const fftest = require("firebase-functions-test");
+// 自動テスト用プロジェクトを初期化
 const test = fftest({
     databaseURL: 'https://firestore-test-mono.firebaseio.com',
     storageBucket: 'firestore-test-mono.appspot.com',
@@ -20,6 +22,7 @@ const test = fftest({
 }, `${__dirname}/../../keys/serviceAccountKey.json`);
 const target = require("../index");
 const firestore = admin.firestore();
+const myUtil = require("../util");
 describe('index.tsに定義されたFirestoreトリガー', () => {
     after(() => {
         test.cleanup();
