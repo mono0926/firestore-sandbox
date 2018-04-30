@@ -26,9 +26,11 @@ describe('index.tsに定義されたFirestoreトリガー', () => {
     title,
     body
   };
-  after(() => {
+  after(async () => {
     test.cleanup();
-    myUtil.deleteCollection(firestore.collection('posts'));
+  });
+  afterEach(async () => {
+    await myUtil.deleteCollection(firestore.collection('posts'));
   });
   context('onUsersPostCreate: /users/test-user1/posts/test-post1 に新規ドキュメント追加', () => {
     before(async () => {

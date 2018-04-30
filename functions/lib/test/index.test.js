@@ -33,10 +33,12 @@ describe('index.tsに定義されたFirestoreトリガー', () => {
         title,
         body
     };
-    after(() => {
+    after(() => __awaiter(this, void 0, void 0, function* () {
         test.cleanup();
-        myUtil.deleteCollection(firestore.collection('posts'));
-    });
+    }));
+    afterEach(() => __awaiter(this, void 0, void 0, function* () {
+        yield myUtil.deleteCollection(firestore.collection('posts'));
+    }));
     context('onUsersPostCreate: /users/test-user1/posts/test-post1 に新規ドキュメント追加', () => {
         before(() => __awaiter(this, void 0, void 0, function* () {
             const snapshot = test.firestore.makeDocumentSnapshot(post, `users/${userId}/posts/${postId}`);
