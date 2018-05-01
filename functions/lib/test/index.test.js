@@ -14,8 +14,7 @@ const assert = chai.assert;
 // Firebaseライブラリ
 const admin = require("firebase-admin");
 const fftest = require("firebase-functions-test");
-// 自動テスト用プロジェクトを初期化
-const test = fftest({
+exports.test = fftest({
     databaseURL: 'https://firestore-test-mono.firebaseio.com',
     storageBucket: 'firestore-test-mono.appspot.com',
     projectId: 'firestore-test-mono'
@@ -23,51 +22,82 @@ const test = fftest({
 const target = require("../index");
 const firestore = admin.firestore();
 const myUtil = require("../util");
-describe('index.tsに定義されたFirestoreトリガー', () => {
-    const userId = 'test-user1';
-    const postId = 'test-post1';
-    const refPath = `users/${userId}/posts/${postId}`;
-    const title = 'test-title';
-    const body = 'test-body';
-    const post = {
-        title,
-        body
-    };
-    after(() => __awaiter(this, void 0, void 0, function* () {
-        test.cleanup();
-    }));
-    afterEach(() => __awaiter(this, void 0, void 0, function* () {
-        yield myUtil.deleteCollection(firestore.collection('posts'));
-    }));
-    context('onUsersPostCreate: /users/test-user1/posts/test-post1 に新規ドキュメント追加', () => {
-        before(() => __awaiter(this, void 0, void 0, function* () {
-            const snapshot = test.firestore.makeDocumentSnapshot(post, `users/${userId}/posts/${postId}`);
-            const wrapped = test.wrap(target.onUsersPostCreate);
-            yield wrapped(snapshot, { params: { userId } });
-        }));
-        it('ルートの posts/test-post1 にコピーされる', () => __awaiter(this, void 0, void 0, function* () {
-            const snap = yield firestore.collection('posts').doc(postId).get();
-            const postCopied = snap.data();
-            assert.equal(postCopied.title, title);
-            assert.equal(postCopied.body, body);
-            assert.equal(postCopied.authorRef.path, 'users/test-user1');
-        }));
+const databaseTriggers_1 = require("../databaseTriggers");
+describe('index.tsに定義されたCloud Fuctions', () => {
+    after(() => {
+        exports.test.cleanup();
     });
-    context('onUsersPostUpdate: /users/test-user1/posts/test-post1 のドキュメント更新', () => {
-        before(() => __awaiter(this, void 0, void 0, function* () {
-            const beforeSnap = test.firestore.makeDocumentSnapshot({}, refPath);
-            const afterSnap = test.firestore.makeDocumentSnapshot(post, refPath);
-            const change = test.makeChange(beforeSnap, afterSnap);
-            const wrapped = test.wrap(target.onUsersPostUpdate);
-            yield wrapped(change, { params: { userId } });
+    describe('Firestor Triggers', () => {
+        const userId = 'test-user1';
+        const postId = 'test-post1';
+        const refPath = `users/${userId}/posts/${postId}`;
+        const title = 'test-title';
+        const body = 'test-body';
+        const post = {
+            title,
+            body
+        };
+        afterEach(() => __awaiter(this, void 0, void 0, function* () {
+            yield myUtil.deleteCollection(firestore.collection('posts'));
         }));
-        it('ルートの posts/test-post1 にコピーされる', () => __awaiter(this, void 0, void 0, function* () {
-            const snapshot = yield firestore.collection('posts').doc(postId).get();
-            const postCopied = snapshot.data();
-            assert.equal(postCopied.title, title);
-            assert.equal(postCopied.body, body);
-            assert.equal(postCopied.authorRef.path, 'users/test-user1');
+        context('onUsersPostCreate: /users/test-user1/posts/test-post1 に新規ドキュメント追加', () => {
+            before(() => __awaiter(this, void 0, void 0, function* () {
+                const snapshot = exports.test.firestore.makeDocumentSnapshot(post, refPath);
+                const wrapped = exports.test.wrap(target.onUsersPostCreate);
+                yield wrapped(snapshot, { params: { userId } });
+            }));
+            it('ルートの posts/test-post1 にコピーされる', () => __awaiter(this, void 0, void 0, function* () {
+                const snap = yield firestore.collection('posts').doc(postId).get();
+                const postCopied = snap.data();
+                assert.equal(postCopied.title, title);
+                assert.equal(postCopied.body, body);
+                assert.equal(postCopied.authorRef.path, 'users/test-user1');
+            }));
+        });
+        context('onUsersPostUpdate: /users/test-user1/posts/test-post1 のドキュメント更新', () => {
+            before(() => __awaiter(this, void 0, void 0, function* () {
+                const beforeSnap = exports.test.firestore.makeDocumentSnapshot({}, refPath);
+                const afterSnap = exports.test.firestore.makeDocumentSnapshot(post, refPath);
+                const change = exports.test.makeChange(beforeSnap, afterSnap);
+                const wrapped = exports.test.wrap(target.onUsersPostUpdate);
+                yield wrapped(change, { params: { userId } });
+            }));
+            it('ルートの posts/test-post1 にコピーされる', () => __awaiter(this, void 0, void 0, function* () {
+                const snapshot = yield firestore.collection('posts').doc(postId).get();
+                const postCopied = snapshot.data();
+                assert.equal(postCopied.title, title);
+                assert.equal(postCopied.body, body);
+                assert.equal(postCopied.authorRef.path, 'users/test-user1');
+            }));
+        });
+    });
+    describe('Databaseトリガー', () => {
+        const userId = 'test-user1';
+        const statusForDatabase = {
+            state: databaseTriggers_1.State.online,
+            lastChanged: 1522540800000 // 2018-04-01T00:00:00+00:00
+        };
+        afterEach(() => __awaiter(this, void 0, void 0, function* () {
+            yield myUtil.deleteCollection(firestore.collection('users'));
         }));
+        context('onDatabaseStatusUpdated: /status/{userId} にstatus更新通知', () => {
+            before(() => __awaiter(this, void 0, void 0, function* () {
+                const refPath = `status/${userId}`;
+                yield admin.database().ref(refPath).set(statusForDatabase);
+                const beforeSnap = exports.test.database.makeDataSnapshot({}, refPath);
+                const afterSnap = exports.test.database.makeDataSnapshot(statusForDatabase, refPath);
+                const change = exports.test.makeChange(beforeSnap, afterSnap);
+                const wrapped = exports.test.wrap(target.onDatabaseStatusUpdated);
+                yield wrapped(change, { params: { userId } });
+                console.log(target.onDatabaseStatusUpdated);
+            }));
+            it('ルートの users/status にコピーされる', () => __awaiter(this, void 0, void 0, function* () {
+                const snap = yield firestore.collection('users').doc(userId).get();
+                const status = snap.data().status;
+                assert.equal(status.state, databaseTriggers_1.State.online);
+                assert.equal(status.lastChanged.getTime(), statusForDatabase.lastChanged);
+            }));
+        });
     });
 });
 //# sourceMappingURL=index.test.js.map

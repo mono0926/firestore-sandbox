@@ -1,0 +1,1 @@
+//# sourceMappingURL=databaseTrigger.js.map

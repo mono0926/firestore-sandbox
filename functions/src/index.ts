@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin';
 import * as util from 'util';
 admin.initializeApp(functions.config().firebase);
 const firestore = admin.firestore();
+import * as databaseTriggers from './databaseTriggers';
 
 export interface Post {
   readonly title: string;
@@ -20,6 +21,8 @@ export const onUsersPostCreate = functions.firestore.document('/users/{userId}/p
 export const onUsersPostUpdate = functions.firestore.document('/users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
   await copyToRootWithUsersPostSnapshot(change.after, context);
 });
+
+export const onDatabaseStatusUpdated = databaseTriggers.onStatusUpdated;
 
 async function copyToRootWithUsersPostSnapshot(snapshot: FirebaseFirestore.DocumentSnapshot, context: functions.EventContext) {
   const postId = snapshot.id;

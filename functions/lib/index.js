@@ -13,6 +13,7 @@ const admin = require("firebase-admin");
 const util = require("util");
 admin.initializeApp(functions.config().firebase);
 const firestore = admin.firestore();
+const databaseTriggers = require("./databaseTriggers");
 exports.onUsersPostCreate = functions.firestore.document('/users/{userId}/posts/{postId}').onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
     console.log(`snapshot: ${util.inspect(snapshot.ref.path)}`);
     yield copyToRootWithUsersPostSnapshot(snapshot, context);
@@ -20,6 +21,7 @@ exports.onUsersPostCreate = functions.firestore.document('/users/{userId}/posts/
 exports.onUsersPostUpdate = functions.firestore.document('/users/{userId}/posts/{postId}').onUpdate((change, context) => __awaiter(this, void 0, void 0, function* () {
     yield copyToRootWithUsersPostSnapshot(change.after, context);
 }));
+exports.onDatabaseStatusUpdated = databaseTriggers.onStatusUpdated;
 function copyToRootWithUsersPostSnapshot(snapshot, context) {
     return __awaiter(this, void 0, void 0, function* () {
         const postId = snapshot.id;
