@@ -6,13 +6,13 @@
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceRoot}/functions",
-            "name": "Test",
+            "name": "Mocha",
             "program": "${workspaceRoot}/functions/node_modules/mocha/bin/_mocha",
             "args": [
                 "${workspaceRoot}/functions/lib/test/**/*.js"
             ],
             "sourceMaps": true,
-            "outFiles": ["${workspaceRoot}/functions/lib/**/*.js"],
+            "outFiles": ["${workspaceRoot}/functions/lib/test/**/*.js"],
             "console": "integratedTerminal"
         }
     ]
