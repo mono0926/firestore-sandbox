@@ -21,6 +21,7 @@ exports.test = fftest({
 }, `${__dirname}/../../keys/serviceAccountKey.json`);
 const target = require("../index");
 const firestore = admin.firestore();
+const database = admin.database();
 const myUtil = require("../util");
 const databaseTriggers_1 = require("../databaseTriggers");
 describe('index.tsに定義されたCloud Fuctions', () => {
@@ -83,7 +84,7 @@ describe('index.tsに定義されたCloud Fuctions', () => {
         context('onDatabaseStatusUpdated: /status/{userId} にstatus更新通知', () => {
             before(() => __awaiter(this, void 0, void 0, function* () {
                 const refPath = `status/${userId}`;
-                yield admin.database().ref(refPath).set(statusForDatabase);
+                yield database.ref(refPath).set(statusForDatabase);
                 const beforeSnap = exports.test.database.makeDataSnapshot({}, refPath);
                 const afterSnap = exports.test.database.makeDataSnapshot(statusForDatabase, refPath);
                 const change = exports.test.makeChange(beforeSnap, afterSnap);

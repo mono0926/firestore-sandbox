@@ -13,6 +13,7 @@ export const test = fftest({
 import * as target from '../index';
 
 const firestore = admin.firestore();
+const database = admin.database();
 
 import * as myUtil from '../util';
 import { FeaturesList } from 'firebase-functions-test/lib/features';
@@ -78,7 +79,7 @@ describe('index.tsに定義されたCloud Fuctions', () => {
     context('onDatabaseStatusUpdated: /status/{userId} にstatus更新通知', () => {
       before(async () => {
         const refPath = `status/${userId}`;
-        await admin.database().ref(refPath).set(statusForDatabase);
+        await database.ref(refPath).set(statusForDatabase);
         const beforeSnap = test.database.makeDataSnapshot({}, refPath);
         const afterSnap = test.database.makeDataSnapshot(statusForDatabase, refPath);
         const change = test.makeChange(beforeSnap, afterSnap)
