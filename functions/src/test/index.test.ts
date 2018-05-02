@@ -75,6 +75,7 @@ describe('index.tsに定義されたCloud Fuctions', () => {
     };
     afterEach(async () => {
       await myUtil.deleteCollection(firestore.collection('users'));
+      await database.ref('status').remove();
     });
     context('onDatabaseStatusUpdated: /status/{userId} にstatus更新通知', () => {
       before(async () => {

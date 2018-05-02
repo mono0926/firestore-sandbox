@@ -80,6 +80,7 @@ describe('index.tsに定義されたCloud Fuctions', () => {
         };
         afterEach(() => __awaiter(this, void 0, void 0, function* () {
             yield myUtil.deleteCollection(firestore.collection('users'));
+            yield database.ref('status').remove();
         }));
         context('onDatabaseStatusUpdated: /status/{userId} にstatus更新通知', () => {
             before(() => __awaiter(this, void 0, void 0, function* () {
